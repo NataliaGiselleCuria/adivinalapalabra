@@ -5,9 +5,9 @@ import { localStorageContext } from '../context/localStorageContext';
 import { dataContext } from '../context/dataContext';
 
 
-export const Table = ({ level }) => {
+export const Table = () => {
 
-    const {currentLevel, onChangeLevel} = useContext(dataContext);
+    const { currentLevel } = useContext(dataContext);
 
     //arma la tabla con seis filas, y le asigna su correspondiente nombre a cada una.
     const rows = [];
@@ -16,7 +16,7 @@ export const Table = ({ level }) => {
     for (let i = 1; i < numRows; i++) {
         let nameRow = "row word" + i;
         rows.push(
-        <Row key={i} name = {nameRow} level={level} />
+        <Row key={i} name = {nameRow} level={currentLevel} />
         );
     }
 

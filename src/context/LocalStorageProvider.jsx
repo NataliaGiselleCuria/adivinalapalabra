@@ -1,5 +1,5 @@
 
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { dataContext } from './dataContext';
 import { localStorageContext } from './localStorageContext'
 import { collection, getDocs } from 'firebase/firestore';
@@ -9,7 +9,7 @@ import { db } from '../firebase/config';
 const LocalStorageProvider = ({ children }) => {
 
     
-    const { currentLevel, enabledRow, onChangeWinningWord } = useContext(dataContext)
+    const { currentLevel, enabledRow, setWinningWord, winningWord } = useContext(dataContext)
  
     //LocalStorag de estadisticas
     let estadisticas = JSON.parse(localStorage.getItem("estadisticas")) || {jugadas:0, victorias:0, word1:0, word2:0, word3:0, word4:0, word5:0, word6:0, perdidas:0};
@@ -28,7 +28,7 @@ const LocalStorageProvider = ({ children }) => {
     localStorage.setItem("savedPlay", JSON.stringify(savedPlay));
 
     //comprobar si hay partida guardada y rellenar la tabla.
-    function checkSavedPlay(){
+    function checkSavedPlay(currentLevel){
         let savedPlayLS = JSON.parse(localStorage.getItem("savedPlay"));
         const keys = document.querySelectorAll('.key');
         for (let lv in savedPlayLS) {
@@ -54,8 +54,7 @@ const LocalStorageProvider = ({ children }) => {
                 };
 
                 if(savedPlayLS[lv].winningWord.length>0){
-                    onChangeWinningWord (savedPlayLS[lv].winningWord)
-                    
+                    setWinningWord(savedPlayLS[lv].winningWord)
                 }
             }
         }
@@ -64,7 +63,6 @@ const LocalStorageProvider = ({ children }) => {
 
         enabledRow();
     }
-
 
     //asignar una palabra ganadora a cada nivel y guardarlo en Local storage.
     function setWordsLevels(){
@@ -106,25 +104,28 @@ const LocalStorageProvider = ({ children }) => {
                         for (let i = 0; i < randomWord.length; i++) {
                             savedPlayLS[lv].winningWord.push(randomWord.charAt(i))
                             localStorage.setItem("savedPlay", JSON.stringify(savedPlayLS));
-                            onChangeWinningWord (savedPlayLS['level'+currentLevel].winningWord) ;
+                            setWinningWord(savedPlayLS['level'+currentLevel].winningWord) ;
                         }
-
                     } else {
-
                         let savedPlayLS = JSON.parse(localStorage.getItem("savedPlay"));
-
-                        onChangeWinningWord (savedPlayLS['level'+currentLevel].winningWord)
-
-                        
+                        setWinningWord(savedPlayLS['level'+currentLevel].winningWord)   
                     }  
                 }
             }
 
         } catch (error) {
             console.error(error);
-        }
-        
+        } 
     }
+
+    useEffect(() => {
+        setWordsLevels()
+        checkSavedPlay(6)
+    }, []);
+
+    useEffect(() => { 
+        checkSavedPlay(currentLevel)
+    }, [currentLevel]);
 
   return ( 
     

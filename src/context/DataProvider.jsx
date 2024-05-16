@@ -1,16 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { dataContext } from './dataContext'
 
 
 const DataProvider = ({ children }) => {
-
-  //palabra ganadora.
-  const [winningWord, setWinningWord] = useState([])
-
-  const onChangeWinningWord = (word) => {
-    setWinningWord(word)
-  }
-
 
   //estado del juego (no finalizado).
   const [finalized, setFinalized] = useState(false)
@@ -18,12 +10,15 @@ const DataProvider = ({ children }) => {
 
   //nivel actual.
   const [currentLevel, setCurrentLevel] = useState(6)
- 
+  console.log(currentLevel)
+
   const onChangeLevel = (lv) => {
     setCurrentLevel(lv)
-    console.log(currentLevel)
   }
  
+  //palabra ganadora.
+  const [winningWord, setWinningWord] = useState([])
+  console.log(winningWord)
 
   //row actual, única habilitada para escribir.
   const [currentRow, setCurrentRow] = useState(null);
@@ -87,10 +82,11 @@ const DataProvider = ({ children }) => {
         event.target.nextElementSibling.focus();
     }
   }
+  
 
   return ( 
     
-    <dataContext.Provider value={{currentLevel, onChangeLevel, currentRow, setCurrentRow, enabledRow, checkFocus, onChangeWinningWord}}>
+    <dataContext.Provider value={{currentLevel, onChangeLevel, currentRow, setCurrentRow, enabledRow, checkFocus, winningWord, setWinningWord}}>
         {children}
     </dataContext.Provider>
   )
