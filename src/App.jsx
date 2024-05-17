@@ -5,7 +5,6 @@ import Keyboard from './components/Keyboard';
 import Levels from './components/Levels'
 import Table from './components/Table'
 
-
 function App() {
 
   return (

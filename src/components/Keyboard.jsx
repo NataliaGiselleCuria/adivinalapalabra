@@ -1,12 +1,19 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import { dataContext } from '../context/dataContext';
+import { functionGameContext } from '../context/functionGameContext';
 
 const Keyboard = () => {
         
+        const { checkCompleteRow } = useContext(functionGameContext)
         const { checkFocus, currentRow } = useContext(dataContext)
+        const currentRowRef = useRef(null);
 
-        useEffect(() => {
+        useEffect(() => {   
                 setEventKeys()
+        }, []);
+
+        useEffect(() => {   
+                currentRowRef.current = currentRow;
         }, [currentRow]);
 
         function setEventKeys() {
@@ -17,18 +24,18 @@ const Keyboard = () => {
         }
 
         function eventKeys(event) {
-                const inputs = currentRow.querySelectorAll('.cell');
+                const inputs = currentRowRef.current.querySelectorAll('.cell');
                 let letter = event.target.innerHTML;
                 let cell;
                 inputs.forEach(input => {
                         if (input.className.includes('cell-focus')) {
                                 if (event.target.innerHTML == 'ENVIAR') {
 
-                                        checkCompleteRow(currentRow);
+                                        checkCompleteRow();
 
                                 } else if (event.target.className.includes('borrar') || event.target.className.includes('fa-delete-left')) {
                                         input.value = "";
-                                        if (!input.id.includes('1')) {
+                                        if (!input.className.includes('0')) {
                                                 input.previousElementSibling.focus();
                                         }
                                 } else {

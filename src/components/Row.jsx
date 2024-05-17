@@ -13,7 +13,6 @@ export const Row = ({ name, level }) => {
             <Cell key={i} name={nameCell} />
         );
     }
-
    
     return (
         <div className={name}>

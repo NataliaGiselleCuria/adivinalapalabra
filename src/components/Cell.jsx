@@ -16,7 +16,7 @@ export const Cell = ({ name }) => {
   const handleKeyDown = (event) => {
     if (event.key === 'Backspace' || event.key === 'Delete') {
       if (event.currentTarget.value.length === 0) {
-        if (!event.currentTarget.id.includes('1')) {
+        if (!event.currentTarget.className.includes('0')) {
           event.currentTarget.previousElementSibling.focus();
         }
       }

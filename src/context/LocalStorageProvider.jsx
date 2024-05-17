@@ -9,7 +9,7 @@ import { db } from '../firebase/config';
 const LocalStorageProvider = ({ children }) => {
 
     
-    const { currentLevel, enabledRow, setWinningWord, winningWord } = useContext(dataContext)
+    const { currentLevel, enabledRow, setWinningWord, agregarClase, cleanTable, cleanKeys } = useContext(dataContext)
  
     //LocalStorag de estadisticas
     let estadisticas = JSON.parse(localStorage.getItem("estadisticas")) || {jugadas:0, victorias:0, word1:0, word2:0, word3:0, word4:0, word5:0, word6:0, perdidas:0};
@@ -18,7 +18,7 @@ const LocalStorageProvider = ({ children }) => {
     localStorage.setItem("estadisticas", JSON.stringify(estadisticas));
     localStorage.setItem("estadisticasAux", JSON.stringify(estadisticasAux));
 
-    //LocalStorage de la jugada
+    //LocalStorage de las palabras jugadas.
     let savedPlay = JSON.parse(localStorage.getItem("savedPlay")) || {
         level6:{word1:[], word2:[], word3:[], word4:[], word5:[], word6:[], winningWord:[]},
         level7:{word1:[], word2:[], word3:[], word4:[], word5:[], word6:[], winningWord:[]},
@@ -27,9 +27,15 @@ const LocalStorageProvider = ({ children }) => {
     };
     localStorage.setItem("savedPlay", JSON.stringify(savedPlay));
 
+
     //comprobar si hay partida guardada y rellenar la tabla.
     function checkSavedPlay(currentLevel){
+
+        cleanTable()
+        cleanKeys()
+
         let savedPlayLS = JSON.parse(localStorage.getItem("savedPlay"));
+
         const keys = document.querySelectorAll('.key');
         for (let lv in savedPlayLS) {
             if (savedPlayLS.hasOwnProperty(lv) && lv === 'level' + currentLevel) {
@@ -118,6 +124,55 @@ const LocalStorageProvider = ({ children }) => {
         } 
     }
 
+    //guarda la palabra jugada en local storage.
+    function saveWordPlayed(attemp, inputLetter, letterState){
+        let savedPlayLS = JSON.parse(localStorage.getItem("savedPlay"));
+
+        for (let lv in savedPlayLS){
+            if(savedPlayLS.hasOwnProperty(lv) && lv === 'level'+currentLevel){
+                for (let value in savedPlayLS[lv]) {
+                    if (savedPlayLS[lv].hasOwnProperty(value) && value === attemp) {
+                        savedPlayLS[lv][value].push({ value: inputLetter, state: letterState });
+                    }
+                }   
+            }
+        }
+
+        localStorage.setItem("savedPlay", JSON.stringify(savedPlayLS));
+
+    }
+
+    //guardar en estadisticas en que intento se terminó el juego (ganada o perdida).
+    function saveAttempStatistics(attemp){
+        let estadisticasAuxLS = JSON.parse(localStorage.getItem("estadisticasAux"));
+
+        for(let estadistica in estadisticasAuxLS){
+            if (estadistica == attemp){
+                estadisticasAuxLS[estadistica]++;
+            }
+        }
+
+        estadisticasAuxLS.victorias++
+
+        localStorage.setItem("estadisticasAux", JSON.stringify(estadisticasAuxLS));
+    }
+
+    //vaciar el local storage del nivel(cuando se termina una partida)
+    function clenLevelStorage(){
+        let savedPlayLS = JSON.parse(localStorage.getItem("savedPlay"));
+
+        for (let lv in savedPlayLS){
+            if(savedPlayLS.hasOwnProperty(lv) && lv === 'level'+currentLevel){
+                for (let word in savedPlayLS[lv]) {
+                    savedPlayLS[lv][word]=([]);
+                };
+            }
+        }
+
+        localStorage.setItem("savedPlay", JSON.stringify(savedPlayLS));
+    }
+    
+     
     useEffect(() => {
         setWordsLevels()
         checkSavedPlay(6)
@@ -129,7 +184,7 @@ const LocalStorageProvider = ({ children }) => {
 
   return ( 
     
-    <localStorageContext.Provider value={{checkSavedPlay, setWordsLevels}}>
+    <localStorageContext.Provider value={{checkSavedPlay, setWordsLevels, saveWordPlayed, saveAttempStatistics, clenLevelStorage}}>
         {children}
     </localStorageContext.Provider>
   )

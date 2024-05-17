@@ -1,7 +1,6 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { Row } from './Row';
 import '../../src/App.css'
-import { localStorageContext } from '../context/localStorageContext';
 import { dataContext } from '../context/dataContext';
 
 
