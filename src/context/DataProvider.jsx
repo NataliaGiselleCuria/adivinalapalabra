@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { dataContext } from './dataContext'
 
 
@@ -117,9 +117,35 @@ const DataProvider = ({ children }) => {
     
   }
 
+  const contextValue = useMemo(() => ({
+    currentLevel, 
+    onChangeLevel, 
+    currentRow, 
+    setCurrentRow, 
+    enabledRow, 
+    checkFocus, 
+    winningWord, 
+    setWinningWord, 
+    agregarClase, 
+    cleanTable, 
+    cleanKeys
+    }), [
+    currentLevel, 
+    onChangeLevel, 
+    currentRow, 
+    setCurrentRow, 
+    enabledRow, 
+    checkFocus, 
+    winningWord, 
+    setWinningWord, 
+    agregarClase, 
+    cleanTable, 
+    cleanKeys
+  ]);
+
   return ( 
     
-    <dataContext.Provider value={{currentLevel, onChangeLevel, currentRow, setCurrentRow, enabledRow, checkFocus, winningWord, setWinningWord, agregarClase, cleanTable, cleanKeys}}>
+    <dataContext.Provider value={contextValue}>
         {children}
     </dataContext.Provider>
   )

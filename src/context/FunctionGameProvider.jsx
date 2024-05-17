@@ -6,15 +6,19 @@ import { useContext, useEffect, useRef, useState } from 'react';
 const FunctionGameProvider = ({ children }) => {
 
     const { winningWord, currentRow, enabledRow, agregarClase } = useContext(dataContext)
-    const { saveWordPlayed, saveAttempStatistics, clenLevelStorage } = useContext(localStorageContext)
+    const { saveWordPlayed, saveAttempStatistics, clenLevelStorage, uploadStatistics, setNewWordLevel } = useContext(localStorageContext)
     const currentRowRef = useRef(null);
+    const winningWordRef = useRef(null);
 
     useEffect(() => {   
         currentRowRef.current = currentRow;
     }, [currentRow]);
 
+    useEffect(() => {   
+        winningWordRef.current = winningWord;
+    }, [winningWord]);
 
-    //estado del juego (no finalizado).
+    //estado del juego.
     const [finalized, setFinalized] = useState(false)
 
  
@@ -36,7 +40,7 @@ const FunctionGameProvider = ({ children }) => {
     }, [checkCompleteRow, currentRow, finalized]);
 
 
-    function checkCompleteRow(currentRow){
+    function checkCompleteRow(){
     
         const inputs = currentRowRef.current.querySelectorAll('input');
         let complete = true;
@@ -49,7 +53,7 @@ const FunctionGameProvider = ({ children }) => {
     
         if (complete) {
     
-            checkLetters(currentRow)
+            checkLetters(currentRowRef.current)
     
         } else {
             const toasts = document.querySelector('#error');
@@ -86,9 +90,9 @@ const FunctionGameProvider = ({ children }) => {
         let letterState;
         const attempt = currentRowRef.current.classList[1];
     
-        // Contar cuantas veces aparece la letra en la palabra ganadora
-        for (let i = 0; i < winningWord.length; i++) {
-            const letter = winningWord[i];
+        // Contar cuantas veces aparece la letra en la palabra ganadora.
+        for (let i = 0; i < winningWordRef.current.length; i++) {
+            const letter = winningWordRef.current[i];
             if (letterCount[letter]) {
                 letterCount[letter]++;
             } else {
@@ -96,11 +100,11 @@ const FunctionGameProvider = ({ children }) => {
             }
         }
 
-        //buscar letras correctas
+        //buscar letras correctas.
         for (let i = 0; i < inputs.length; i++) {
             const inputLetter = inputs[i].value.toLowerCase();
 
-            if (winningWord[i] === inputLetter) {
+            if (winningWordRef.current[i] === inputLetter) {
                 agregarClase(inputs[i], 'correct-cell');
                 successes++;
                 correctPositions.push(i);
@@ -117,14 +121,14 @@ const FunctionGameProvider = ({ children }) => {
             }
         }
 
-        // buscar letras contenidas e incorrectas
+        // buscar letras presentes e incorrectas.
         for (let i = 0; i < inputs.length; i++) {
             const inputLetter = inputs[i].value.toLowerCase();
 
             if (!correctPositions.includes(i)) {
                 
 
-                if (winningWord.includes(inputLetter) && letterCount[inputLetter] > 0) {
+                if (winningWordRef.current.includes(inputLetter) && letterCount[inputLetter] > 0) {
                     letterState = 'contain';
                     letterCount[inputLetter]--;
                 } else {
@@ -143,15 +147,15 @@ const FunctionGameProvider = ({ children }) => {
             }
         }
 
-
+        // finalizar el juego (si la palabra es la correcta o se acabaron los intentos), o continuar el juego.
         if (successes == inputs.length){
 
-            saveAttempStatistics(attemp)
+            saveAttempStatistics(attempt)
             clenLevelStorage()
             // festejo();
             finalizedishGame()
 
-        }else{
+        }else{ 
 
             if(!currentRowRef.current.classList.contains('6')){
 
@@ -159,14 +163,9 @@ const FunctionGameProvider = ({ children }) => {
 
             }else{
 
-                let estadisticasAuxLS = JSON.parse(localStorage.getItem("estadisticasAux"));
-
-                estadisticasAuxLS.perdidas++
-
-                localStorage.setItem("estadisticasAux", JSON.stringify(estadisticasAuxLS));
-
-                // clenLevelStorage(level);
-                // finalizedishGame()
+                lostGameStatistics()
+                clenLevelStorage();
+                finalizedishGame()
             } 
         } 
     }
@@ -177,39 +176,15 @@ const FunctionGameProvider = ({ children }) => {
 
         setFinalized(true);
         
-        let estadisticasLS = JSON.parse(localStorage.getItem("estadisticas"));
-        let estadisticasAuxLS = JSON.parse(localStorage.getItem("estadisticasAux"));
-
-        estadisticasLS.jugadas++
-
-        estadisticasLS.victorias = Math.round((estadisticasAuxLS.victorias*100)/estadisticasLS.jugadas);
-        estadisticasLS.word1 = (estadisticasAuxLS.word1==0)? "0" : Math.round((estadisticasAuxLS.word1*100)/estadisticasLS.jugadas);
-        estadisticasLS.word2 = (estadisticasAuxLS.word2==0)? "0" : Math.round((estadisticasAuxLS.word2*100)/estadisticasLS.jugadas);
-        estadisticasLS.word3 = (estadisticasAuxLS.word3==0)? "0" : Math.round((estadisticasAuxLS.word3*100)/estadisticasLS.jugadas);
-        estadisticasLS.word4 = (estadisticasAuxLS.word4==0)? "0" : Math.round((estadisticasAuxLS.word4*100)/estadisticasLS.jugadas);
-        estadisticasLS.word5 = (estadisticasAuxLS.word5==0)? "0" : Math.round((estadisticasAuxLS.word5*100)/estadisticasLS.jugadas);
-        estadisticasLS.word6 = (estadisticasAuxLS.word6==0)? "0" : Math.round((estadisticasAuxLS.word6*100)/estadisticasLS.jugadas);
-        estadisticasLS.perdidas = (estadisticasAuxLS.perdidas==0)? "0" : Math.round((estadisticasAuxLS.perdidas*100)/estadisticasLS.jugadas);
-
-        localStorage.setItem("estadisticas", JSON.stringify(estadisticasLS));
-        localStorage.setItem("estadisticasAux", JSON.stringify(estadisticasAuxLS));
+        uploadStatistics()
         
-        setStatistics()
+        // setStatistics()
 
         setTimeout(() => {
-            openStatics();
+            // openStatics();
         }, 800);
 
-        let savedPlayLS = JSON.parse(localStorage.getItem("savedPlay"));
-
-        for(let lv in savedPlayLS){
-            if(savedPlayLS.hasOwnProperty(lv) && lv === 'level'+currentLevel){
-
-                savedPlayLS[lv].winningWord=([])
-                localStorage.setItem("savedPlay", JSON.stringify(savedPlayLS));
-                setWord(currentLevel);
-            }
-        }
+        setNewWordLevel()
     }
 
     return ( 

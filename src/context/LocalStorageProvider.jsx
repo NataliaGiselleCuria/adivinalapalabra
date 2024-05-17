@@ -1,5 +1,5 @@
 
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useMemo, useRef } from 'react';
 import { dataContext } from './dataContext';
 import { localStorageContext } from './localStorageContext'
 import { collection, getDocs } from 'firebase/firestore';
@@ -9,7 +9,12 @@ import { db } from '../firebase/config';
 const LocalStorageProvider = ({ children }) => {
 
     
-    const { currentLevel, enabledRow, setWinningWord, agregarClase, cleanTable, cleanKeys } = useContext(dataContext)
+    const { currentRow, currentLevel, enabledRow, setWinningWord, agregarClase, cleanTable, cleanKeys } = useContext(dataContext)
+    const currentRowRef = useRef(null);
+
+    useEffect(() => {   
+        currentRowRef.current = currentRow;
+    }, [currentRow]);
  
     //LocalStorag de estadisticas
     let estadisticas = JSON.parse(localStorage.getItem("estadisticas")) || {jugadas:0, victorias:0, word1:0, word2:0, word3:0, word4:0, word5:0, word6:0, perdidas:0};
@@ -70,6 +75,7 @@ const LocalStorageProvider = ({ children }) => {
         enabledRow();
     }
 
+
     //asignar una palabra ganadora a cada nivel y guardarlo en Local storage.
     function setWordsLevels(){
         let levels = 6;
@@ -85,7 +91,8 @@ const LocalStorageProvider = ({ children }) => {
         processLevels(); // Iniciar el proceso
     }
 
-    //Busca la palabra ganadora aleatoriamente por nivel en el json.
+
+    //Busca la palabra ganadora aleatoriamente por nivel en base de datos.
     async function setWord(level){
 
         const wordsRef = collection(db, "wordsLevels");
@@ -124,6 +131,7 @@ const LocalStorageProvider = ({ children }) => {
         } 
     }
 
+
     //guarda la palabra jugada en local storage.
     function saveWordPlayed(attemp, inputLetter, letterState){
         let savedPlayLS = JSON.parse(localStorage.getItem("savedPlay"));
@@ -142,6 +150,7 @@ const LocalStorageProvider = ({ children }) => {
 
     }
 
+
     //guardar en estadisticas en que intento se terminó el juego (ganada o perdida).
     function saveAttempStatistics(attemp){
         let estadisticasAuxLS = JSON.parse(localStorage.getItem("estadisticasAux"));
@@ -156,6 +165,17 @@ const LocalStorageProvider = ({ children }) => {
 
         localStorage.setItem("estadisticasAux", JSON.stringify(estadisticasAuxLS));
     }
+
+
+    //guardar en estadisticas la partida perdida.
+    function lostGameStatistics(){
+        let estadisticasAuxLS = JSON.parse(localStorage.getItem("estadisticasAux"));
+
+        estadisticasAuxLS.perdidas++
+
+        localStorage.setItem("estadisticasAux", JSON.stringify(estadisticasAuxLS));
+    }
+
 
     //vaciar el local storage del nivel(cuando se termina una partida)
     function clenLevelStorage(){
@@ -172,6 +192,42 @@ const LocalStorageProvider = ({ children }) => {
         localStorage.setItem("savedPlay", JSON.stringify(savedPlayLS));
     }
     
+
+    //subir las nuevas estadisticas cuando se termina el juego.
+    function uploadStatistics(){
+        let estadisticasLS = JSON.parse(localStorage.getItem("estadisticas"));
+        let estadisticasAuxLS = JSON.parse(localStorage.getItem("estadisticasAux"));
+    
+        estadisticasLS.jugadas++
+    
+        estadisticasLS.victorias = Math.round((estadisticasAuxLS.victorias*100)/estadisticasLS.jugadas);
+        estadisticasLS.word1 = (estadisticasAuxLS.word1==0)? "0" : Math.round((estadisticasAuxLS.word1*100)/estadisticasLS.jugadas);
+        estadisticasLS.word2 = (estadisticasAuxLS.word2==0)? "0" : Math.round((estadisticasAuxLS.word2*100)/estadisticasLS.jugadas);
+        estadisticasLS.word3 = (estadisticasAuxLS.word3==0)? "0" : Math.round((estadisticasAuxLS.word3*100)/estadisticasLS.jugadas);
+        estadisticasLS.word4 = (estadisticasAuxLS.word4==0)? "0" : Math.round((estadisticasAuxLS.word4*100)/estadisticasLS.jugadas);
+        estadisticasLS.word5 = (estadisticasAuxLS.word5==0)? "0" : Math.round((estadisticasAuxLS.word5*100)/estadisticasLS.jugadas);
+        estadisticasLS.word6 = (estadisticasAuxLS.word6==0)? "0" : Math.round((estadisticasAuxLS.word6*100)/estadisticasLS.jugadas);
+        estadisticasLS.perdidas = (estadisticasAuxLS.perdidas==0)? "0" : Math.round((estadisticasAuxLS.perdidas*100)/estadisticasLS.jugadas);
+    
+        localStorage.setItem("estadisticas", JSON.stringify(estadisticasLS));
+        localStorage.setItem("estadisticasAux", JSON.stringify(estadisticasAuxLS));
+    }
+
+
+    //asignar una nueva palabra ganadora al nivel terminado.
+    function setNewWordLevel(){
+
+        let savedPlayLS = JSON.parse(localStorage.getItem("savedPlay"));
+
+        for(let lv in savedPlayLS){
+            if(savedPlayLS.hasOwnProperty(lv) && lv === 'level'+currentLevel){
+
+                savedPlayLS[lv].winningWord=([])
+                localStorage.setItem("savedPlay", JSON.stringify(savedPlayLS));
+                setWord(currentLevel);
+            }
+        }
+    }
      
     useEffect(() => {
         setWordsLevels()
@@ -182,9 +238,29 @@ const LocalStorageProvider = ({ children }) => {
         checkSavedPlay(currentLevel)
     }, [currentLevel]);
 
+    const contextValue = useMemo(() => ({
+        checkSavedPlay,
+        setWordsLevels,
+        saveWordPlayed,
+        saveAttempStatistics,
+        clenLevelStorage,
+        lostGameStatistics,
+        uploadStatistics,
+        setNewWordLevel
+    }), [
+        checkSavedPlay,
+        setWordsLevels,
+        saveWordPlayed,
+        saveAttempStatistics,
+        clenLevelStorage,
+        lostGameStatistics,
+        uploadStatistics,
+        setNewWordLevel
+    ]);
+
   return ( 
     
-    <localStorageContext.Provider value={{checkSavedPlay, setWordsLevels, saveWordPlayed, saveAttempStatistics, clenLevelStorage}}>
+    <localStorageContext.Provider value={contextValue}>
         {children}
     </localStorageContext.Provider>
   )
