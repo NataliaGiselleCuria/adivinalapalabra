@@ -228,10 +228,63 @@ const LocalStorageProvider = ({ children }) => {
             }
         }
     }
+
+
+    //mostrar estadisticas en componente Statistics.
+    function setStatistics(){
+        let estadisticasLS = JSON.parse(localStorage.getItem("estadisticas"));
+        let estadisticasAuxLS = JSON.parse(localStorage.getItem("estadisticasAux"));
+
+        const plays = document.querySelector('#plays')
+        plays.innerHTML = estadisticasLS.jugadas;
+
+        const won = document.querySelector('#won')
+        won.innerHTML = estadisticasLS.victorias;
+
+        // graphic
+
+        const try1Graphic =  document.querySelector('.try-1');
+        const try1Text = document.querySelector('.try-1P');
+        try1Text.innerHTML = estadisticasAuxLS.word1 + ' (' + estadisticasLS.word1 + '%)';
+        try1Graphic.style.width = estadisticasLS.word1 + "%";
+
+        const try2Graphic =  document.querySelector('.try-2');
+        const try2Text = document.querySelector('.try-2P');
+        try2Text.innerHTML = estadisticasAuxLS.word2 + ' (' + estadisticasLS.word2 + '%)';;
+        try2Graphic.style.width = estadisticasLS.word2 + "%";
+
+        const try3Graphic =  document.querySelector('.try-3');
+        const try3Text = document.querySelector('.try-3P');
+        try3Text.innerHTML = estadisticasAuxLS.word3 + ' (' + estadisticasLS.word3 + '%)';;
+        try3Graphic.style.width = estadisticasLS.word3 + "%";
+
+        const try4Graphic =  document.querySelector('.try-4');
+        const try4Text = document.querySelector('.try-4P');
+        try4Text.innerHTML = estadisticasAuxLS.word4 + ' (' + estadisticasLS.word4 + '%)';
+        try4Graphic.style.width = estadisticasLS.word4 + "%";
+        
+        const try5Graphic =  document.querySelector('.try-5');
+        const try5Text = document.querySelector('.try-5P');
+        try5Text.innerHTML = estadisticasAuxLS.word5 + ' (' + estadisticasLS.word5 + '%)';
+        try5Graphic.style.width = estadisticasLS.word5 + "%";
+
+        const try6Graphic =  document.querySelector('.try-6');
+        const try6Text = document.querySelector('.try-6P');
+        try6Text.innerHTML = estadisticasAuxLS.word6 + ' (' + estadisticasLS.word6 + '%)';
+        try6Graphic.style.width = estadisticasLS.word6 + "%";
+
+        const lossGraphic = document.querySelector('.loss');
+        const lossText = document.querySelector('.lossP');
+        lossText.innerHTML = estadisticasAuxLS.perdidas + ' (' + estadisticasLS.perdidas + '%)';
+        lossGraphic.style.width = estadisticasLS.perdidas + "%";
+
+    }
+
      
     useEffect(() => {
         setWordsLevels()
         checkSavedPlay(6)
+        setStatistics()
     }, []);
 
     useEffect(() => { 
@@ -246,7 +299,9 @@ const LocalStorageProvider = ({ children }) => {
         clenLevelStorage,
         lostGameStatistics,
         uploadStatistics,
-        setNewWordLevel
+        setNewWordLevel,
+        setStatistics,
+       
     }), [
         checkSavedPlay,
         setWordsLevels,
@@ -255,7 +310,8 @@ const LocalStorageProvider = ({ children }) => {
         clenLevelStorage,
         lostGameStatistics,
         uploadStatistics,
-        setNewWordLevel
+        setNewWordLevel,
+        setStatistics,
     ]);
 
   return ( 

@@ -1,12 +1,13 @@
 import { functionGameContext} from './functionGameContext'
 import { dataContext } from './dataContext';
 import { localStorageContext } from './localStorageContext'
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef } from 'react';
 
 const FunctionGameProvider = ({ children }) => {
 
-    const { winningWord, currentRow, enabledRow, agregarClase } = useContext(dataContext)
-    const { saveWordPlayed, saveAttempStatistics, clenLevelStorage, uploadStatistics, setNewWordLevel } = useContext(localStorageContext)
+    const { finalized, setFinalized, winningWord, currentRow, enabledRow, agregarClase, openStatics, closeStatics, cleanTable, cleanKeys, festejo } = useContext(dataContext)
+    const { saveWordPlayed, saveAttempStatistics, clenLevelStorage, uploadStatistics, setNewWordLevel, setStatistics } = useContext(localStorageContext)
+    
     const currentRowRef = useRef(null);
     const winningWordRef = useRef(null);
 
@@ -18,8 +19,7 @@ const FunctionGameProvider = ({ children }) => {
         winningWordRef.current = winningWord;
     }, [winningWord]);
 
-    //estado del juego.
-    const [finalized, setFinalized] = useState(false)
+    
 
  
     //comprobar si la celda fue compleatada.
@@ -81,7 +81,7 @@ const FunctionGameProvider = ({ children }) => {
 
     //comprobar la palabra ingredasa y asignarle un estado (correta, presente, incorrecta).
     function checkLetters(){
-
+        
         const inputs = currentRowRef.current.querySelectorAll('input');
         const keys = document.querySelectorAll('.key');
         let successes = 0;
@@ -152,7 +152,7 @@ const FunctionGameProvider = ({ children }) => {
 
             saveAttempStatistics(attempt)
             clenLevelStorage()
-            // festejo();
+            festejo();
             finalizedishGame()
 
         }else{ 
@@ -174,22 +174,42 @@ const FunctionGameProvider = ({ children }) => {
     // terminar juego
     function finalizedishGame(){
 
-        setFinalized(true);
-        
-        uploadStatistics()
-        
-        // setStatistics()
+        setFinalized(true);    
+        uploadStatistics()        
+        setStatistics()
 
         setTimeout(() => {
-            // openStatics();
+            openStatics();
         }, 800);
 
         setNewWordLevel()
     }
 
+
+    // resetear juego
+    const canvas = document.getElementById("canvas");
+    function reset(){
+        setFinalized(false);
+        cleanTable();
+        cleanKeys();
+        enabledRow();
+        closeStatics();
+        canvas.style.display="none";
+    }
+
+    const contextValue = useMemo(() => ({
+        checkCompleteRow,
+        finalized,
+        reset
+    }), [
+        checkCompleteRow,
+        finalized,
+        reset
+    ]);
+
     return ( 
     
-        <functionGameContext.Provider value={{checkCompleteRow, finalized}}>
+        <functionGameContext.Provider value={contextValue}>
             {children}
         </functionGameContext.Provider>
     )

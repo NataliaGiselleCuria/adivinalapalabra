@@ -20,9 +20,9 @@ export const Table = () => {
     }
 
     return (
-        <div id='table'>
+        <section id='table'>
            {rows}
-        </div>
+        </section>
     )
 }
 
