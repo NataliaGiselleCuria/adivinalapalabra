@@ -6,6 +6,7 @@ import Levels from './components/Levels'
 import Table from './components/Table'
 import Statistics from './components/Statistics'
 import Config from './components/Config';
+import Question from './components/Question';
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
       <Table/>
       <Keyboard />
       <Statistics/>
+      <Question/>
     </>
   )
 }
