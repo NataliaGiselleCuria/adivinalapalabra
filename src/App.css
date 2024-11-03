@@ -344,7 +344,7 @@ i.fa-solid.fa-question {
 #statistics, #question {
   position: absolute;
   width: 100%;
-  height: 100%;
+  height: 98dvh;
   top: 110%;
   box-shadow: 0px 1px 5px 1px #e3e3e3;
   background: white;
