@@ -353,24 +353,24 @@ i.fa-solid.fa-question {
   overflow: auto;
 }
 
-#question::-webkit-scrollbar {
-  width: 1px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: transparent;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: transparent;
-}
+.question-cont::-webkit-scrollbar {
+    width: 1px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: transparent;
+  }
 
 .statistics-cont, .question-cont {
   width: 90%;
@@ -696,8 +696,7 @@ a span{
 @media (max-width: 470px){
 
   body{
-      min-height: unset;
-      height: 100vh;
+      height: 100dvh;
       min-height: 700px;
   }
 
@@ -747,7 +746,8 @@ a span{
   }
 
   .statistics-cont, .question-cont {
-    padding-bottom: 30px;
+    height: 100%;
+    padding-bottom: 50px;
   }
 
   .statistics-cont h4, .question-cont h4 {
