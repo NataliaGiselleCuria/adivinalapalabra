@@ -466,6 +466,11 @@ i.fa-solid.fa-question {
 .question-cont-txt {
   display: flex;
   flex-direction: column;
+  gap: 20px;
+}
+
+.question-cont-txt p{
+  margin: 0;
 }
 
 .question-cont-txt, .demostration {
