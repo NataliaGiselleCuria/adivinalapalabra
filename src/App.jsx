@@ -25,6 +25,7 @@ function App() {
       </section>
       <Table/>
       <Keyboard />
+      <a href='https://nataliacuria-dev.netlify.app/'><span>Natalia Curia</span> | Desarrollo Web</a>
       <Statistics/>
       <Question/>
     </>

@@ -1,9 +1,4 @@
-/* #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-} */
+
 
 :root{
   --grey: #e3e3e3;
@@ -355,6 +350,26 @@ i.fa-solid.fa-question {
   background: white;
   transition: all 0.3s ease;
   z-index: 1;
+  overflow: auto;
+}
+
+#question::-webkit-scrollbar {
+  width: 1px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: transparent;
 }
 
 .statistics-cont, .question-cont {
@@ -451,7 +466,6 @@ i.fa-solid.fa-question {
 .question-cont-txt {
   display: flex;
   flex-direction: column;
-  gap: 15px;
 }
 
 .question-cont-txt, .demostration {
@@ -491,7 +505,7 @@ canvas {
 }
 
 
-/*-- Dar mode--*/
+/*-- Dark mode--*/
 
 .switch {
   width: 50px;
@@ -646,9 +660,26 @@ body.active #button{
   box-shadow: 2px 2px 5px 3px var(--border-dark);
 }
 
+a {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  font-family: 'Rubik', sans-serif;
+  color: #8b8a8a;
+  font-size: smaller;
+  margin-bottom: 10px;
+}
+
+a span{
+  font-weight: 500;
+}
+
 @media (max-width: 725px){
   #root {
       width: 100vw;
+      height: 100dvh;
   }
 
   #table {
@@ -667,7 +698,7 @@ body.active #button{
   body{
       min-height: unset;
       height: 100vh;
-      min-height: 600px;
+      min-height: 700px;
   }
 
   h1 {
@@ -716,7 +747,7 @@ body.active #button{
   }
 
   .statistics-cont, .question-cont {
-      min-height: unset;
+    padding-bottom: 30px;
   }
 
   .statistics-cont h4, .question-cont h4 {
